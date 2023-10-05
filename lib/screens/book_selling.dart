@@ -15,7 +15,8 @@ class BookSellingScreen extends StatefulWidget {
   final BookModel bookModel;
   final UserModel userModel;
   final User firebaseUser;
-  const BookSellingScreen({super.key, required this.bookModel, required this.userModel, required this.firebaseUser});
+  final int semester;
+  const BookSellingScreen({super.key, required this.bookModel, required this.userModel, required this.firebaseUser, required this.semester});
 
   @override
   State<BookSellingScreen> createState() => _BookSellingScreenState();
@@ -69,48 +70,61 @@ class _BookSellingScreenState extends State<BookSellingScreen> {
 
   void sell () async {
 
-    try{
-      String bookName = bookNameController.text.trim();
-      String bookEdition = bookEditionController.text.trim();
-      String authorName = authorNameController.text.trim();
-      String price = priceController.text.trim();
-      String description = descriptionController.text.trim();
+    String bookName = bookNameController.text.trim();
+    String bookEdition = bookEditionController.text.trim();
+    String authorName = authorNameController.text.trim();
+    String price = priceController.text.trim();
+    String description = descriptionController.text.trim();
 
-      String uid = const Uuid().v1();
-      BookModel newBookModel = BookModel(
-          uid: uid,
-          sellerId: widget.firebaseUser.uid,
-          sellerName: widget.userModel.fullName.toString(),
-          subjectName: widget.bookModel.subjectName,
-          bookName: bookName,
-          bookAuthor: authorName,
-          bookEdition: bookEdition,
-          bookPrice: price,
-          description: description,
-          department: widget.bookModel.department,
-          semester: widget.bookModel.semester,
-          imageUrl: ""
-      );
-
-      if(imageFile!=null){
-        UploadTask uploadTask = FirebaseStorage.instance.ref('book-pictures').child(newBookModel.uid.toString()).putFile(imageFile!);
-        TaskSnapshot taskSnapshot = await uploadTask;
-
-        String? imageUrl = await taskSnapshot.ref.getDownloadURL();
-
-        // widget.userModel.profilepic = imageUrl;
-        newBookModel.imageUrl = imageUrl;
-      }
-      else{
-        log("Please upload an image of your book.");
-      }
-
-      CollectionReference booksCollection = FirebaseFirestore.instance.collection("books");
-      await booksCollection.add(newBookModel.toMap());
-      log("Book added Successfully");
+    if(bookName == "" || bookEdition == "" || authorName == ""){
+      showDialog(context: context, builder: (BuildContext context){
+        return const AlertDialog(title: Text("Please fill Book details"));
+      });
     }
-    catch(e){
-      log("Error adding Data: $e");
+    else {
+      try{
+        String uid = const Uuid().v1();
+        BookModel newBookModel = BookModel(
+            uid: uid,
+            sellerId: widget.firebaseUser.uid,
+            sellerName: widget.userModel.fullName.toString(),
+            subjectName: widget.bookModel.subjectName,
+            bookName: bookName,
+            bookAuthor: authorName,
+            bookEdition: bookEdition,
+            bookPrice: price,
+            description: description,
+            department: widget.bookModel.department,
+            semester: widget.semester,
+            imageUrl: ""
+        );
+
+        if(imageFile!=null){
+          UploadTask uploadTask = FirebaseStorage.instance.ref('book-pictures').child(newBookModel.uid.toString()).putFile(imageFile!);
+          TaskSnapshot taskSnapshot = await uploadTask;
+
+          String? imageUrl = await taskSnapshot.ref.getDownloadURL();
+
+          // widget.userModel.profilepic = imageUrl;
+          newBookModel.imageUrl = imageUrl;
+        }
+        else{
+          log("Please upload an image of your book.");
+        }
+
+        CollectionReference booksCollection = FirebaseFirestore.instance.collection("books");
+        await booksCollection.add(newBookModel.toMap());
+        log("Book added Successfully");
+
+        showDialog(context: context, builder: (BuildContext context){
+          return AlertDialog(
+            title: Text("Book sold Successfully."),
+          );
+        });
+      }
+      catch(e){
+        log("Error adding Data: $e");
+      }
     }
   }
 
@@ -121,54 +135,57 @@ class _BookSellingScreenState extends State<BookSellingScreen> {
         title: const Text("Sell Book"),
         centerTitle: true,
       ),
-      body: Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            // CupertinoButton(onPressed: (){}, borderRadius: BorderRadius.circular(10), child: const Icon(Icons.book)),
-            const SizedBox(height: 10),
-            TextField(
-              controller: bookNameController,
-              decoration: const InputDecoration(
-                labelText: "Enter Book Name",
-                icon: Icon(Icons.book)
-              ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: bookEditionController,
-              decoration: const InputDecoration(
-                  labelText: "Enter Book Edition",
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              // CupertinoButton(onPressed: (){}, borderRadius: BorderRadius.circular(10), child: const Icon(Icons.book)),
+              const SizedBox(height: 10),
+              TextField(
+                controller: bookNameController,
+                decoration: const InputDecoration(
+                  labelText: "Enter Book Name",
                   icon: Icon(Icons.book)
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: authorNameController,
-              decoration: const InputDecoration(
-                  labelText: "Enter Author Name",
-                  icon: Icon(Icons.book)
+              const SizedBox(height: 10),
+              TextField(
+                controller: bookEditionController,
+                decoration: const InputDecoration(
+                    labelText: "Enter Book Edition",
+                    icon: Icon(Icons.book)
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: priceController,
-              decoration: const InputDecoration(
-                  labelText: "Enter Book Price",
-                  icon: Icon(Icons.currency_rupee)
+              const SizedBox(height: 10),
+              TextField(
+                controller: authorNameController,
+                decoration: const InputDecoration(
+                    labelText: "Enter Author Name",
+                    icon: Icon(Icons.book)
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: descriptionController,
-              decoration: const InputDecoration(
-                  labelText: "Enter Description",
-                  icon: Icon(Icons.description)
+              const SizedBox(height: 10),
+              TextField(
+                controller: priceController,
+                decoration: const InputDecoration(
+                    labelText: "Enter Book Price",
+                    icon: Icon(Icons.currency_rupee)
+                ),
               ),
-            ),
-            ElevatedButton(onPressed: (){showPhotoOptions();}, child: const Text("Pic of the Book.")),
-            ElevatedButton(onPressed: (){sell();}, child: const Text("Sell Book"))
-          ],
+              const SizedBox(height: 10),
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(
+                    labelText: "Enter Description",
+                    icon: Icon(Icons.description)
+                ),
+              ),
+              ElevatedButton(onPressed: (){showPhotoOptions();}, child: const Text("Pic of the Book.")),
+              ElevatedButton(onPressed: (){sell();}, child: const Text("Sell Book"))
+            ],
+          ),
         ),
       ),
     );

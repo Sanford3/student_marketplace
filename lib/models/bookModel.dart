@@ -41,6 +41,7 @@ class BookModel {
       "price": bookPrice,
       "description": description,
       "department" : department,
+      "semester" : semester,
       "image": imageUrl
     };
   }

@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:student_marketplace/screens/comps.dart';
 import '../models/UserModel.dart';
@@ -17,12 +20,29 @@ class _DepartmentScreenState extends State<DepartmentScreen> {
 
   final List<String> arr = ["First year", "Computer", "IT", "AI & DS", "EXTC", "Chemical"];
 
+  void logout() async {
+    await FirebaseAuth.instance.signOut();
+    log("User logged out.");
+    Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
+  }
+
   @override
   Widget build(BuildContext context) {
-    double deviceWidth = MediaQuery.of(context).size.width;
 
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.white,
+          actions: [
+            ElevatedButton(onPressed: (){logout();},
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.white),
+              ),
+                child: const Icon(Icons.logout_outlined, color: Colors.black)
+            )
+          ],
+        ),
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Container(
