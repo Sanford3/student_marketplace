@@ -4,8 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:student_marketplace/models/bookModel.dart';
+import 'package:student_marketplace/models/chatroom.dart';
 import 'package:student_marketplace/screens/bookDetails.dart';
 import 'package:student_marketplace/screens/book_selling.dart';
+import 'package:student_marketplace/screens/messages.dart';
+import 'package:uuid/uuid.dart';
 import '../models/UserModel.dart';
 import 'chat_screen.dart';
 
@@ -80,10 +83,50 @@ class _BookListingScreenState extends State<BookListingScreen> {
     }
   }
 
-  void chatWithSeller(){
+  void chatWithSeller(String sellerId) async{
 
-    Navigator.push(context, MaterialPageRoute(builder: (context)=> ChatRoomScreen(firebaseUser: widget.firebaseUser, userModel: widget.userModel, bookModel: widget.bookModel)));
+    // check if chatroom already exists.
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection("chatrooms")
+        .where("participants.${widget.firebaseUser.uid}", isEqualTo: true)
+        .where("participants.$sellerId", isEqualTo: true)
+        .get();
 
+    log(querySnapshot.docs.length.toString());
+    ChatRoomModel chatRoomModel;
+    if(querySnapshot.docs.isEmpty){
+      var uuid = const Uuid();
+
+      // create a chatroom if not.
+      chatRoomModel = ChatRoomModel(
+          chatroomid: "",
+          participants: {
+            widget.firebaseUser.uid: true,
+            sellerId: true
+          },
+          lastMessage: ""
+      );
+      // Reference to the chatroom document in the "chatrooms" collection
+      DocumentReference docRef = await FirebaseFirestore.instance.collection("chatrooms").add(chatRoomModel!.toMap());
+
+      // Retrieve the generated ID and update the chatroomid field
+      chatRoomModel.chatroomid = docRef.id;
+
+      // Now, you can update the document with the correct chatroomid
+      await docRef.update({"chatroomid": chatRoomModel.chatroomid});
+    }
+    else {
+      // Use data() to get the document data as Map<String, dynamic>
+      Map<String, dynamic>? data = querySnapshot.docs[0].data() as Map<String, dynamic>?;
+
+      if (data != null) {
+        // Handle the case where data is not null
+        chatRoomModel = ChatRoomModel.fromMap(data);
+      } else {
+        // Handle the case where data is null (optional, depending on your use case)
+        chatRoomModel = ChatRoomModel(chatroomid: "", participants: {}, lastMessage: "");
+      }
+    }
+    Navigator.push(context, MaterialPageRoute(builder: (context)=> ChatRoomScreen(firebaseUser: widget.firebaseUser, userModel: widget.userModel, bookModel: widget.bookModel, chatRoomModel: chatRoomModel!)));
   }
 
   @override
@@ -180,14 +223,23 @@ class _BookListingScreenState extends State<BookListingScreen> {
                                   ElevatedButton(
                                     onPressed: () {
                                       widget.firebaseUser.uid == book.sellerId ?
-                                          deleteBook(book.uid.toString())
+                                          Navigator.push(context, MaterialPageRoute(builder: (context)=> MessagesScreen(firebaseUser: widget.firebaseUser, userModel: widget.userModel, bookModel: book)))
                                           :
-                                          Navigator.push(context, MaterialPageRoute(builder: (context)=> ChatRoomScreen(firebaseUser: widget.firebaseUser, userModel: widget.userModel, bookModel: widget.bookModel)));
+                                          chatWithSeller(book.sellerId.toString());
                                     },
-                                    child: widget.firebaseUser.uid == book.sellerId ? const Text("Delete Book") : const Text("Chat with Seller.")
+                                    child: widget.firebaseUser.uid == book.sellerId ? const Text("Chat with Buyer") : const Text("Chat with Seller.")
                                   ),
                                 ],
                               ),
+                              widget.firebaseUser.uid == book.sellerId ?
+                              ElevatedButton(
+                                  onPressed: () {
+                                    deleteBook(book.uid.toString());
+                                  },
+                                  child: Text("Delete Book")
+                              )
+                                  :
+                                  Container()
                             ],
                           ),
                         ),

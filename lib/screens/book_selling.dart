@@ -36,6 +36,7 @@ class _BookSellingScreenState extends State<BookSellingScreen> {
     log("Image Picked Successfully");
     if(pickedFile!=null){
       imageFile = File(pickedFile.path);
+      setState(() {});
     }
   }
 
@@ -66,6 +67,7 @@ class _BookSellingScreenState extends State<BookSellingScreen> {
         ),
       );
     });
+    setState(() {});
   }
 
   void sell () async {
@@ -141,7 +143,14 @@ class _BookSellingScreenState extends State<BookSellingScreen> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              // CupertinoButton(onPressed: (){}, borderRadius: BorderRadius.circular(10), child: const Icon(Icons.book)),
+              CupertinoButton(
+                onPressed: (){showPhotoOptions();},
+                child: CircleAvatar(
+                  backgroundImage: (imageFile!=null)? FileImage(imageFile!) : null,
+                  radius: 60,
+                  child: (imageFile==null) ? const Icon(Icons.book, size: 70) : null,
+                ),
+              ),
               const SizedBox(height: 10),
               TextField(
                 controller: bookNameController,
@@ -182,7 +191,8 @@ class _BookSellingScreenState extends State<BookSellingScreen> {
                     icon: Icon(Icons.description)
                 ),
               ),
-              ElevatedButton(onPressed: (){showPhotoOptions();}, child: const Text("Pic of the Book.")),
+              const SizedBox(height: 20),
+              // ElevatedButton(onPressed: (){showPhotoOptions();}, child: const Text("Pic of the Book.")),
               ElevatedButton(onPressed: (){sell();}, child: const Text("Sell Book"))
             ],
           ),

@@ -3,7 +3,6 @@ import 'package:student_marketplace/models/bookModel.dart';
 
 class BookDetailScreen extends StatelessWidget {
   final BookModel book;
-
   const BookDetailScreen({Key? key, required this.book}) : super(key: key);
 
   @override
@@ -26,6 +25,20 @@ class BookDetailScreen extends StatelessWidget {
                   book.imageUrl ?? '',
                   fit: BoxFit.cover,
                 ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              "Book Name",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              book.sellerName ?? ' ',
+              style: const TextStyle(
+                fontSize: 20,
               ),
             ),
             const SizedBox(height: 24),

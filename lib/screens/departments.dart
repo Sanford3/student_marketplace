@@ -101,6 +101,7 @@ class _DepartmentState extends State<Department> {
         width: deviceWidth,
         decoration: BoxDecoration(
           color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.5),
