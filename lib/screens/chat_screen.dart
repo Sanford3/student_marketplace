@@ -1,4 +1,5 @@
 import 'dart:developer';
+// import 'dart:html';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -27,37 +28,64 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   void sendMessage () {
 
     String message = messageController.text.trim();
+    if(message!="") {
+      var uuid = const Uuid();
+      MessageModel messageModel = MessageModel(
+          chatroom: widget.chatRoomModel.chatroomid,
+          messageId: uuid.v1(),
+          sender: widget.firebaseUser.uid,
+          seen: false,
+          text: message,
+          createdOn: DateTime.now()
+      );
 
-    var uuid = const Uuid();
-    MessageModel messageModel = MessageModel(
-      chatroom: widget.chatRoomModel.chatroomid,
-      messageId: uuid.v1(),
-      sender: widget.firebaseUser.uid,
-      seen: false,
-      text: message,
-      createdOn: DateTime.now()
-    );
+      widget.chatRoomModel.lastMessage = message;
+      FirebaseFirestore.instance.collection("chatrooms")
+          .doc(widget.chatRoomModel.chatroomid)
+          .set(widget.chatRoomModel.toMap());
 
-    widget.chatRoomModel.lastMessage=message;
-    FirebaseFirestore.instance.collection("chatrooms")
-    .doc(widget.chatRoomModel.chatroomid)
-    .set(widget.chatRoomModel.toMap());
+      FirebaseFirestore.instance.collection("chatrooms")
+          .doc(widget.chatRoomModel.chatroomid)
+          .collection("messages")
+          .doc(messageModel.messageId)
+          .set(messageModel.toMap());
 
-    FirebaseFirestore.instance.collection("chatrooms")
+      log("Message sent.");
+      messageController.clear();
+    }
+  }
+
+  String? targetUserName;
+  void getTargetUser () async {
+
+    DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance.collection("chatrooms")
         .doc(widget.chatRoomModel.chatroomid)
-        .collection("messages")
-        .doc(messageModel.messageId)
-        .set(messageModel.toMap());
+        .get();
+    log("This is Document Snapshot -> ${documentSnapshot.data().toString()}");
 
-    log("Message sent.");
-    messageController.clear();
+    ChatRoomModel chatRoomModel =
+    ChatRoomModel.fromMap(documentSnapshot.data() as Map<String, dynamic>);
+
+    Map<String, dynamic>? participants = chatRoomModel.participants;
+
+      String targetUserId = participants!.keys.firstWhere((userId) => userId != widget.firebaseUser.uid);
+
+      log("My id: ${widget.firebaseUser.uid}");
+      log("Target User ID: $targetUserId");
+
+      DocumentSnapshot documentSnapshot2 = await FirebaseFirestore.instance.collection("users").doc(targetUserId).get();
+      log("DocumentSnapshot: ${documentSnapshot2.data().toString()}");
+
+      targetUserName = (documentSnapshot2.data() as Map<String, dynamic>)["fullname"];
+      log(targetUserName.toString());
+      setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.bookModel.sellerName.toString()),
+        title: Text(targetUserName.toString()),
         centerTitle: true,
         actions: [
           ElevatedButton(onPressed: (){}, child: const Icon(Icons.logout_outlined))
@@ -138,7 +166,10 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                     ),
                     // Icon(Icons.send_sharp, color: Theme.of(context).colorScheme.secondary),
                     IconButton(
-                        onPressed: (){sendMessage();},
+                        onPressed: (){
+                          sendMessage();
+                          getTargetUser();
+                        },
                         icon: const Icon(Icons.send_sharp))
                   ],
                 ),

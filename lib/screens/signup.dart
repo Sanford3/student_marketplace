@@ -1,12 +1,10 @@
 import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:student_marketplace/screens/verification.dart';
-
 import '../models/UserModel.dart';
 import 'login.dart';
 
@@ -52,8 +50,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             uid: uid,
             email: email,
             fullName: "",
-            prn: "",
-            iCardPic: ""
+            prn: ""
         );
         await FirebaseFirestore.instance.collection("users").doc(uid).set(
             newUser.toMap()).then((value) {
@@ -160,7 +157,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const Text("Already Signed Up?"),
                 CupertinoButton(child: const Text("Log In"), onPressed: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()));
+                      MaterialPageRoute(builder: (context) => const LoginScreen()));
                 })
               ],
             ),

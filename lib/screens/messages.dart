@@ -74,7 +74,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Messages"),
+        title: const Text("Messages"),
         centerTitle: true,
         automaticallyImplyLeading: true,
       ),

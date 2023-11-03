@@ -106,7 +106,7 @@ class _BookListingScreenState extends State<BookListingScreen> {
           lastMessage: ""
       );
       // Reference to the chatroom document in the "chatrooms" collection
-      DocumentReference docRef = await FirebaseFirestore.instance.collection("chatrooms").add(chatRoomModel!.toMap());
+      DocumentReference docRef = await FirebaseFirestore.instance.collection("chatrooms").add(chatRoomModel.toMap());
 
       // Retrieve the generated ID and update the chatroomid field
       chatRoomModel.chatroomid = docRef.id;
@@ -236,7 +236,7 @@ class _BookListingScreenState extends State<BookListingScreen> {
                                   onPressed: () {
                                     deleteBook(book.uid.toString());
                                   },
-                                  child: Text("Delete Book")
+                                  child: const Text("Delete Book")
                               )
                                   :
                                   Container()

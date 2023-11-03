@@ -5,6 +5,7 @@ class BookDetailScreen extends StatelessWidget {
   final BookModel book;
   const BookDetailScreen({Key? key, required this.book}) : super(key: key);
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

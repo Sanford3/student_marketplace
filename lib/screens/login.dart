@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:student_marketplace/models/UserModel.dart';
+import 'package:student_marketplace/screens/departments.dart';
 import 'package:student_marketplace/screens/signup.dart';
 import 'package:student_marketplace/screens/verification.dart';
 
@@ -42,7 +43,7 @@ class _LoginPageState extends State<LoginScreen> {
       log("Login Successful.");
 
       Navigator.push(context, MaterialPageRoute(
-          builder: (context) => VerificationScreen(firebaseUser: userCredential!.user!, userModel: userModel)));
+          builder: (context) => VerificationScreen(userModel: userModel, firebaseUser: userCredential!.user!)));
 
       // Navigator.push(context, MaterialPageRoute(builder: (context)=>HomePage()));
     }
