@@ -1,10 +1,10 @@
 import 'dart:developer';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:student_marketplace/screens/comps.dart';
 import '../models/UserModel.dart';
+import 'fe.dart';
 import 'login.dart';
 
 class DepartmentScreen extends StatefulWidget {
@@ -93,15 +93,31 @@ class _DepartmentState extends State<Department> {
     double deviceWidth = MediaQuery.of(context).size.width;
 
     return InkWell(
-      onTap: (){
-        Navigator.push(context, MaterialPageRoute(builder: (context)=> CompsDepartmentScreen(userModel: widget.userModel, firebaseUser: widget.firebaseUser)));
+      onTap: () {
+        if (widget.department == "First year") {
+          // Navigate to FE department screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FeDepartmentScreen(userModel: widget.userModel, firebaseUser: widget.firebaseUser),
+            ),
+          );
+        } else {
+          // Navigate to Comps department screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CompsDepartmentScreen(userModel: widget.userModel, firebaseUser: widget.firebaseUser),
+            ),
+          );
+        }
       },
-      child: Container(
+    child: Container(
         height: 150,
         width: deviceWidth,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          borderRadius: const BorderRadius.all(Radius.circular(10.0)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.5),
