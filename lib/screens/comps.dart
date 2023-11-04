@@ -20,12 +20,12 @@ class CompsDepartmentScreen extends StatefulWidget {
 class _CompsDepartmentScreenState extends State<CompsDepartmentScreen> {
 
   var sems = [3, 4, 5, 6, 7, 8];
-  final List<String> sem3 = ["Digital Logic & Computer Architecture", "Computer Graphics", "Discrete Structures and Graph Theory", "Data Structures", "JAVA", "Maths"];
+  final List<String> sem3 = ["DLCA", "Computer Graphics", "DSGT", "Data Structures", "JAVA", "Maths"];
   final List<String> sem4 = ["Maths", "Analysis Of Algorithm", "Database Management System", "Operating Systems", "Microprocessors", "Python"];
-  final List<String> sem5 = ["Computer Networks", "Data Warehouse & Mining", "Software Engineering", "Theoretical Computer Science", "Internet Programming", "Professional Communication Ethics"];
-  final List<String> sem6 = ["System Prog & Compiler Construction", "Cryptography & System Security", "Mobile Computing", "Artificial Intelligence", "Internet of Things", "Digital Signal & Image Processing"];
+  final List<String> sem5 = ["Computer Networks", "Data Warehouse & Mining", "Software Engineering", "Theoretical Computer Science", "Internet Programming", "PCE"];
+  final List<String> sem6 = ["Compiler Construction", "Cryptography & System Security", "Mobile Computing", "Artificial Intelligence", "Internet of Things", "DS & Image Processing"];
   final List<String> sem7 = ["Machine Learning", "Quantum Computing", "Natural Language Processing", "Augmented and Virtual Reality", "BlockChain", "Information Retrieval"];
-  final List<String> sem8 = ["Distributed Computing", "Deep Learning", "Digital Forensic", "Applied Data Science", "Optimization in Machine Learning", "High Performance Computing", "Social Media Analytics"];
+  final List<String> sem8 = ["Distributed Computing", "Deep Learning", "Digital Forensic", "Applied Data Science", "Optimization in ML", "High Performance Computing", "Social Media Analytics"];
 
   @override
   Widget build(BuildContext context) {

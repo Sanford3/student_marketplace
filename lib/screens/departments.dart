@@ -42,6 +42,7 @@ class _DepartmentScreenState extends State<DepartmentScreen> {
                 child: const Icon(Icons.logout_outlined, color: Colors.black)
             )
           ],
+          automaticallyImplyLeading: false,
         ),
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
